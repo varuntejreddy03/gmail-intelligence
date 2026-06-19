@@ -238,14 +238,7 @@ app.post("/v1/ai/reprocess", auth, async (req: any, res) => {
 });
 
 // --- Start ---
-if (require.main === module) {
-  // Only listen when run directly (dev mode)
-  app.listen(PORT, () => {
-    console.log(`\n[API] ✓ Express on http://localhost:${PORT}`);
-    console.log(`[API] ✓ Groq: ${process.env.GROQ_API_KEY ? "configured" : "MISSING"}`);
-    console.log(`[API] ✓ Supabase: ${process.env.SUPABASE_URL ? "configured" : "MISSING"}\n`);
-  });
-  setInterval(() => {}, 1 << 30);
-}
-
-export default app;
+app.listen(PORT, () => {
+  console.log(`[API] Express on port ${PORT}`);
+});
+setInterval(() => {}, 1 << 30);

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:backend": "npx tsx backend/index.ts",
     "build": "next build",
-    "start": "NODE_ENV=production node --import tsx server.js",
+    "start": "npx tsx backend/index.ts & next start -p ${PORT:-3000}",
     "start:frontend": "next start",
     "start:backend": "npx tsx backend/index.ts",
     "lint": "next lint",
