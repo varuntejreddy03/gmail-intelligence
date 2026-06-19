@@ -16,7 +16,13 @@ const categoryColors: Record<EmailCategory, string> = {
 export function EmailCard({ thread }: { thread: EmailThread }): JSX.Element {
   const sender = thread.participants[0] ?? "Unknown";
   const initials = sender.slice(0, 2).toUpperCase();
-  const time = formatDistanceToNowStrict(new Date(thread.lastMessageAt), { addSuffix: true });
+  const time = (() => {
+    try {
+      const d = new Date(thread.lastMessageAt);
+      if (isNaN(d.getTime())) return "";
+      return formatDistanceToNowStrict(d, { addSuffix: true });
+    } catch { return ""; }
+  })();
 
   return (
     <Link
