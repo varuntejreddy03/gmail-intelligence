@@ -28,8 +28,9 @@ export function EmailCard({ thread }: { thread: EmailThread }): JSX.Element {
       style={{
         background: !thread.isRead ? 'rgba(208,188,255,0.03)' : 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(255,255,255,0.06)',
+        transform: 'translateX(0)',
+        transition: 'transform 200ms ease-out',
       }}
-      style={{ transform: "translateX(0)", transition: "transform 200ms ease-out" }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateX(4px)"; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateX(0)"; }}
     >

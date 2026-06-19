@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import type { EmailEmbedding } from "@/types";
 
-export function SourceCard({ source, index }: { source: EmailEmbedding; index: number }): JSX.Element {
+export function SourceCard({ source }: { source: EmailEmbedding }): JSX.Element {
   const [expanded, setExpanded] = useState(false);
 
   return (

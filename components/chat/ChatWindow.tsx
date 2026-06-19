@@ -157,7 +157,7 @@ export function ChatWindow(): JSX.Element {
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: 16 }}>
           {sources.length ? (
-            sources.map((source, i) => <SourceCard key={source.id} source={source} index={i} />)
+            sources.map((source) => <SourceCard key={source.id} source={source} />)
           ) : (
             <div style={{ paddingTop: 80, textAlign: "center", fontSize: 12, color: "#4b5563" }}>
               Ask a question to retrieve sources.

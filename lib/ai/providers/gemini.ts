@@ -3,7 +3,6 @@ import OpenAI from "openai";
 
 import { requireEnv } from "@/lib/env";
 import {
-  CHAT_SYSTEM_PROMPT,
   COMPOSE_PROMPT,
   EMAIL_SUMMARY_PROMPT,
   REPLY_PROMPT,
@@ -127,11 +126,6 @@ export async function generateGroundedChat(
   context: string,
   history: ChatMessage[],
 ): Promise<string> {
-  const transcript = history
-    .slice(-10)
-    .map((m) => `${m.role.toUpperCase()}: ${m.content}`)
-    .join("\n");
-
   // Cap context to ~6000 chars to stay within Groq free tier TPM
   const trimmedContext = context.slice(0, 6000);
   const userPrompt = `EMAIL CONTEXT:\n${trimmedContext}\n\nUSER QUESTION: ${query}\n\nINSTRUCTIONS: Answer the user's question based ONLY on the email context above. If the context contains relevant information, summarize it with source citations. If not, say you could not find that information.`;
