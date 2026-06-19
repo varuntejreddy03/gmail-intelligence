@@ -11,12 +11,11 @@ export function htmlToPlainText(html: string): string {
 /** Sanitizes email HTML for safe rendering. */
 export function sanitizeEmailHtml(html: string): string {
   return sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "style"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
       img: ["src", "alt", "width", "height"],
       a: ["href", "target", "rel"],
-      "*": ["style", "class"],
     },
     allowedSchemes: ["http", "https", "mailto"],
   });
