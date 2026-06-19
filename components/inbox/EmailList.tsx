@@ -65,9 +65,9 @@ export function EmailList(): JSX.Element {
   }
 
   return (
-    <div className="px-8 pb-10">
+    <div className="px-4 sm:px-8 pb-10">
       {/* Header */}
-      <div className="flex items-end justify-between py-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 py-6 sm:py-8">
         <div>
           <h2 className="text-[30px] font-semibold tracking-[-0.01em] text-[#e4e1e9]">Inbox</h2>
           <p className="text-sm text-[#cbc3d7] mt-1">

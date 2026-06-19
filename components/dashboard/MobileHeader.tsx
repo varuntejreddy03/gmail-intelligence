@@ -2,23 +2,44 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Inbox, PenLine, Sparkles } from "lucide-react";
-
-import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/", label: "Inbox", icon: Inbox },
-  { href: "/chat", label: "Ask", icon: Bot },
-  { href: "/compose", label: "Write", icon: PenLine },
+  { href: "/", label: "Inbox", icon: "inbox" },
+  { href: "/chat", label: "Ask AI", icon: "auto_awesome" },
+  { href: "/compose", label: "Compose", icon: "edit" },
 ];
 
-/** Provides compact primary navigation on small screens. */
 export function MobileHeader(): JSX.Element {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-950/90 px-4 backdrop-blur lg:hidden">
-      <Link href="/" className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500 text-white"><Sparkles className="h-4 w-4" /></Link>
-      <nav className="flex items-center gap-1">{links.map((link) => { const active = link.href === "/" ? pathname === "/" || pathname.startsWith("/thread/") : pathname.startsWith(link.href); return <Link key={link.href} href={link.href} className={cn("flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs", active ? "bg-zinc-800 text-zinc-100" : "text-zinc-500")}><link.icon className="h-3.5 w-3.5" />{link.label}</Link>; })}</nav>
-    </header>
+    <>
+      {/* Top bar */}
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b px-4 lg:hidden" style={{ background: '#0f0f0f', borderColor: '#1f1f1f' }}>
+        <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Aetheric Mail</span>
+        <span style={{ fontSize: 10, color: '#a78bfa', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>AI Email</span>
+      </header>
+
+      {/* Bottom navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around lg:hidden" style={{ height: 60, background: '#0f0f0f', borderTop: '1px solid #1f1f1f' }}>
+        {links.map((link) => {
+          const active = link.href === "/" ? pathname === "/" || pathname.startsWith("/thread/") : pathname.startsWith(link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                padding: '8px 16px', borderRadius: 12, textDecoration: 'none',
+                color: active ? '#a78bfa' : '#6b7280',
+                background: active ? 'rgba(124,58,237,0.1)' : 'transparent',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 22, ...(active ? { fontVariationSettings: "'FILL' 1" } : {}) }}>{link.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 500 }}>{link.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

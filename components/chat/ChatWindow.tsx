@@ -149,8 +149,8 @@ export function ChatWindow(): JSX.Element {
         </div>
       </div>
 
-      {/* Right Sources Panel */}
-      <div style={{ width: 340, background: "#0d0d0d", borderLeft: "1px solid #1f1f1f", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Right Sources Panel - hidden on mobile */}
+      <div className="hidden lg:flex" style={{ width: 340, background: "#0d0d0d", borderLeft: "1px solid #1f1f1f", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "20px 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1f1f1f" }}>
           <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", color: "#6b7280", textTransform: "uppercase" }}>Cited Sources</span>
           <span style={{ fontSize: 10, fontWeight: 700, background: "#14532d", color: "#4ade80", padding: "2px 8px", borderRadius: 999 }}>RAG ACTIVE</span>
