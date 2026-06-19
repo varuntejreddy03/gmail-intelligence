@@ -1,185 +1,261 @@
-# Gmail Intelligence Platform
+# 🧠 Gmail Intelligence Platform
 
-An AI-powered email management platform that connects to Gmail, processes emails intelligently, and provides a conversational AI assistant grounded in your inbox data.
+<div align="center">
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Express](https://img.shields.io/badge/Express-5-000?style=for-the-badge&logo=express)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google-Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![NVIDIA](https://img.shields.io/badge/NVIDIA-NIM-76B900?style=for-the-badge&logo=nvidia&logoColor=white)
 
-- **Gmail Integration** — OAuth 2.0 authentication, full inbox sync with pagination, incremental sync
-- **AI Chat Agent** — Ask questions about your emails with source-cited answers (RAG pipeline)
-- **Email Summarization** — On-demand thread and message summaries via Gemini AI
-- **Compose & Reply** — AI-drafted emails from natural language prompts with thread context
-- **Email Categorization** — Auto-classify emails (Newsletter, Job, Finance, Notifications, Personal, Work) via NVIDIA NIM
-- **Thread Awareness** — All features operate on threads as first-class entities
+**An AI-powered email intelligence platform that connects to Gmail, processes emails with AI, and provides a conversational assistant grounded in your inbox.**
 
-## Architecture
+[Live Demo](https://repeatless.varuntej.online) · [Architecture](./Architecture.md) · [API Docs](#api-endpoints)
+
+</div>
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 📬 **Gmail Sync** | OAuth 2.0 integration with full/incremental sync, pagination, rate limiting |
+| 🤖 **AI Chat Agent** | Ask questions about your emails with source-cited, grounded answers |
+| 📝 **Smart Compose** | Generate professional emails from natural language prompts |
+| ↩️ **Thread-Aware Reply** | AI drafts replies with full conversation context + proper headers |
+| 🏷️ **Auto Categorization** | Classify emails into 6 categories using NVIDIA NIM |
+| 📊 **Summarization** | On-demand thread and message summaries |
+| 🔍 **Semantic Search** | pgvector embeddings + keyword search for intelligent retrieval |
+
+---
+
+## 🏗️ Architecture
 
 ```
-Browser → Next.js (Auth + Proxy) → Express Backend (Business Logic) → Supabase + AI APIs
-                                                                    → Worker (Gmail Sync via Upstash Redis)
+┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│   Next.js Frontend  │────▶│   Express Backend    │────▶│    Supabase      │
+│   (React + Auth)    │     │   (Business Logic)   │     │  (PostgreSQL +   │
+│   Port 3000         │     │   Port 4000          │     │   pgvector)      │
+└─────────────────────┘     └──────────┬───────────┘     └─────────────────┘
+                                       │
+                            ┌──────────┼───────────┐
+                            ▼          ▼           ▼
+                     ┌──────────┐ ┌────────┐ ┌──────────┐
+                     │  Gemini  │ │  Groq  │ │  NVIDIA  │
+                     │  (Primary│ │(Fallback│ │   NIM    │
+                     │   + RAG) │ │  Chat) │ │(Classify)│
+                     └──────────┘ └────────┘ └──────────┘
 ```
 
-See [Architecture.md](./Architecture.md) for full system design documentation.
+> Full architecture documentation: [Architecture.md](./Architecture.md)
 
-## Tech Stack
+---
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14, React 18, Tailwind CSS |
-| Backend | Express.js (TypeScript) |
-| Database | Supabase (PostgreSQL + pgvector) |
-| Primary AI | Google Gemini 2.0 Flash (+ DeepSeek fallback via OpenRouter) |
-| Secondary AI | NVIDIA NIM (meta/llama-3.1-8b-instruct) |
-| Queue | Upstash Redis |
-| Auth | NextAuth (Auth.js v5) with Google OAuth |
+## 🛠️ Tech Stack
 
-## Project Structure
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Frontend | Next.js 14, React 18, Tailwind CSS | UI + OAuth session |
+| Backend | Express.js (TypeScript) | API + business logic |
+| Database | Supabase (PostgreSQL + pgvector) | Storage + vector search |
+| Primary AI | Google Gemini 2.0 Flash | Chat, summarization, compose |
+| Fallback AI | Groq (Llama 3.1 8B) | Chat when Gemini quota exceeded |
+| Classification | NVIDIA NIM (Llama 3.1 8B Instruct) | Email categorization |
+| Embeddings | OpenRouter (text-embedding-3-small) | Semantic search vectors |
+| Auth | NextAuth (Auth.js v5) | Google OAuth 2.0 |
+
+---
+
+## 📁 Project Structure
 
 ```
 gmail-intelligence/
-├── app/                    # Next.js App Router (frontend + auth)
-│   ├── (auth)/login/       # Login page
-│   ├── (dashboard)/        # Protected dashboard pages
-│   │   ├── chat/           # AI chat page
-│   │   ├── compose/        # Email composition page
-│   │   ├── inbox/          # Inbox redirect
-│   │   └── thread/[id]/    # Thread detail view
-│   └── api/
-│       ├── auth/           # NextAuth endpoints
-│       └── v1/[...path]/   # Catch-all proxy to Express backend
-├── backend/                # Express.js backend (port 4000)
-│   ├── middleware/auth.ts  # Internal secret validation
-│   ├── routes/gmail.ts     # Gmail sync, list, send endpoints
-│   ├── routes/ai.ts        # Chat, summarize, compose, categorize
-│   └── index.ts            # Express server entry
-├── worker/                 # Background job processor
-│   └── index.ts            # Polls Upstash Redis for sync jobs
-├── lib/                    # Shared libraries
-│   ├── ai/                 # AI integrations (Gemini, NVIDIA, RAG)
-│   ├── gmail/              # Gmail API client, parser, rate limiter
-│   ├── queue/              # Upstash Redis queue utilities
-│   ├── supabase/           # Database client, queries, schema
-│   └── utils/              # Crypto, sanitization helpers
-├── components/             # React components
-├── types/                  # Shared TypeScript types
-├── Architecture.md         # System design document
-└── .env.example            # Environment variables template
+├── app/                          # Next.js Frontend
+│   ├── (auth)/login/             # Login page
+│   ├── (dashboard)/              # Inbox, Chat, Compose, Thread
+│   └── api/auth/                 # NextAuth endpoints
+│
+├── backend/                      # Express API Server
+│   ├── src/
+│   │   ├── config/               # App configuration
+│   │   ├── controllers/          # Request handlers
+│   │   ├── errors/               # Error classes
+│   │   ├── middleware/           # Auth, error handling
+│   │   ├── routes/               # Route definitions
+│   │   ├── services/             # Business logic
+│   │   └── validators/           # Input validation
+│   └── index.ts                  # Server entry (self-contained)
+│
+├── lib/                          # Shared Libraries
+│   ├── ai/
+│   │   ├── embeddings/           # Vector embeddings (OpenRouter)
+│   │   ├── prompts/              # Prompt templates
+│   │   ├── providers/            # LLM integrations
+│   │   └── rag/                  # RAG pipeline
+│   ├── database/                 # Supabase client + queries
+│   ├── gmail/                    # Gmail API (client, sync, parser)
+│   └── constants/                # App constants
+│
+├── components/                   # React UI Components
+├── hooks/                        # Custom React hooks
+├── store/                        # Zustand state management
+├── types/                        # Shared TypeScript types
+└── docs/                         # Documentation
 ```
 
-## Local Setup
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm
 - Google Cloud project with Gmail API enabled
-- Supabase project
-- API keys for: Gemini, NVIDIA NIM, OpenRouter (fallback)
+- Supabase project with pgvector
+- API keys: Gemini, NVIDIA NIM, Groq, OpenRouter
 
-### 1. Install Dependencies
+### 1. Clone & Install
 
 ```bash
+git clone https://github.com/varuntejreddy03/gmail-intelligence.git
 cd gmail-intelligence
 npm install
 ```
 
-### 2. Configure Environment
+### 2. Environment Setup
 
 ```bash
 cp .env.example .env.local
+# Fill in all values (see Environment Variables below)
 ```
 
-Fill in all values in `.env.local` (see Environment Variables section below).
+### 3. Database Setup
 
-### 3. Set Up Supabase
-
-Run the schema in your Supabase SQL editor:
-```bash
-# Copy contents of lib/supabase/schema.sql into Supabase SQL Editor
-```
-
-Enable the pgvector extension:
+Run the schema in Supabase SQL Editor:
 ```sql
+-- Copy contents of lib/database/schema.sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-### 4. Configure Google OAuth
+### 4. Google OAuth Setup
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable Gmail API
-3. Create OAuth 2.0 credentials (Web application)
-4. Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-5. Add your email as a test user in OAuth consent screen → Audience
+1. [Google Cloud Console](https://console.cloud.google.com/) → Enable Gmail API
+2. Create OAuth 2.0 credentials (Web application)
+3. Add redirect URI: `http://localhost:3000/api/auth/callback/google`
+4. Add your email as test user in OAuth consent screen
 
-### 5. Run the Application
-
-Open **3 terminals**:
+### 5. Run Locally
 
 ```bash
-# Terminal 1 — Frontend (port 3000)
+# Terminal 1 — Frontend
 npm run dev
 
-# Terminal 2 — Backend (port 4000)
+# Terminal 2 — Backend
 npm run dev:backend
-
-# Terminal 3 — Worker (background sync)
-npm run dev:worker
 ```
 
-### 6. Use the App
+Open [http://localhost:3000](http://localhost:3000)
 
-1. Open http://localhost:3000
-2. Sign in with Google
-3. Click "SYNC GMAIL" to start email sync
-4. Browse inbox, use AI chat, compose emails
+---
 
-## Environment Variables
+## 🔑 Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `AUTH_SECRET` | NextAuth session encryption secret (generate with `openssl rand -base64 32`) |
-| `AUTH_URL` | Application URL (`http://localhost:3000`) |
+| `AUTH_SECRET` | NextAuth encryption secret |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side only) |
-| `GEMINI_API_KEY` | Google Gemini API key from [AI Studio](https://aistudio.google.com/apikey) |
-| `NVIDIA_API_KEY` | NVIDIA NIM API key from [build.nvidia.com](https://build.nvidia.com) |
-| `NVIDIA_API_BASE` | NVIDIA NIM base URL (`https://integrate.api.nvidia.com/v1`) |
-| `OPENROUTER_API_KEY` | OpenRouter API key for DeepSeek fallback |
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
-| `TOKEN_ENCRYPTION_KEY` | AES-256 key for encrypting OAuth tokens at rest |
-| `BACKEND_URL` | Express backend URL (`http://localhost:4000`) |
-| `BACKEND_INTERNAL_SECRET` | Shared secret between Next.js and Express |
-| `BACKEND_PORT` | Express port (`4000`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
+| `GEMINI_API_KEY` | Google Gemini API key |
+| `GROQ_API_KEY` | Groq API key (chat fallback) |
+| `NVIDIA_API_KEY` | NVIDIA NIM API key |
+| `OPENROUTER_API_KEY` | OpenRouter API key (embeddings) |
+| `TOKEN_ENCRYPTION_KEY` | AES-256 encryption key |
+| `BACKEND_INTERNAL_SECRET` | Secret between frontend ↔ backend |
 
-## API Endpoints (Express Backend)
+> See [.env.example](./.env.example) for full list with descriptions.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/health` | Health check |
-| POST | `/v1/gmail/sync` | Queue Gmail sync job |
-| GET | `/v1/gmail/messages` | List inbox threads (paginated) |
-| GET | `/v1/gmail/thread/:id` | Get thread with messages |
-| POST | `/v1/gmail/send` | Send email via Gmail API |
-| POST | `/v1/ai/chat` | RAG-powered inbox chat |
-| POST | `/v1/ai/summarize` | Summarize thread or message |
-| POST | `/v1/ai/compose` | AI email composition |
-| POST | `/v1/ai/categorize` | Categorize single thread |
-| POST | `/v1/ai/reprocess` | Batch categorize (max 25) |
+---
 
-## Key Libraries
+## 📡 API Endpoints
 
-- `@google/generative-ai` — Google Gemini SDK
-- `openai` — OpenAI-compatible client (used for NVIDIA NIM + OpenRouter)
-- `googleapis` — Gmail API client
-- `@supabase/supabase-js` — Supabase database client
-- `@upstash/redis` — Serverless Redis queue
-- `next-auth` — Authentication framework
-- `express` — Backend HTTP framework
-- `zod` — Runtime validation
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check |
+| `POST` | `/v1/gmail/sync` | Trigger Gmail sync |
+| `GET` | `/v1/gmail/messages` | List inbox threads (paginated) |
+| `GET` | `/v1/gmail/thread/:id` | Get thread with all messages |
+| `POST` | `/v1/gmail/send` | Send email via Gmail |
+| `POST` | `/v1/ai/chat` | AI chat (RAG pipeline) |
+| `POST` | `/v1/ai/summarize` | Summarize thread/message |
+| `POST` | `/v1/ai/compose` | AI email composition |
+| `POST` | `/v1/ai/categorize` | Classify single thread |
+| `POST` | `/v1/ai/reprocess` | Batch categorize (max 25) |
 
-## License
+---
+
+## 🧪 AI Design
+
+### RAG Pipeline
+```
+User Query → Keyword Extraction → Supabase Text Search → Build Context → Groq/Gemini → Response
+```
+
+- **Retrieval**: Extracts meaningful keywords, searches email subjects/body/sender
+- **Context**: Formats retrieved emails with full source attribution (sender, subject, date, ID)
+- **Generation**: Groq Llama 3.1 8B generates grounded responses with citations
+- **Fallback**: If Gemini quota allows, uses Gemini 2.0 Flash as primary
+
+### Categorization (NVIDIA NIM)
+Classifies into: Newsletter, Job/Recruitment, Finance, Notifications, Personal, Work/Professional
+
+### Anti-Hallucination
+- System prompt enforces source-only answers
+- Every response cites sender + subject
+- Refuses to answer if information isn't in email context
+
+---
+
+## 📋 Gmail API Strategy
+
+- **Initial Sync**: Paginated fetch of up to 10,000 messages with exponential backoff
+- **Incremental Sync**: History-based delta updates via `historyId`
+- **Rate Limiting**: Token bucket (250 units/sec) + retry with jitter
+- **Thread Awareness**: Threads as first-class entities, messages nested within
+
+---
+
+## ⚠️ Notes
+
+- **Google OAuth**: App is not Google-verified (takes 4-6 weeks). Click "Advanced" → "Go to app (unsafe)" when signing in.
+- **Free Tier Limits**: Gemini has daily quota limits. Groq serves as automatic fallback.
+- **Embeddings**: Generated via OpenRouter on sync. Text search used as fallback when embeddings unavailable.
+
+---
+
+## 🏛️ Trade-offs & Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| On-demand AI processing | Conserves free-tier API quotas for 5000+ emails |
+| Groq as fallback | Gemini 429s are common on free tier; Groq provides reliable fallback |
+| Text search + embeddings | Hybrid approach works without pre-embedding all emails |
+| Express separate from Next.js | Clear separation of concerns, independently scalable |
+| Single `backend/index.ts` | Avoids tsx module caching issues in development |
+
+---
+
+## 📄 License
 
 MIT
+
+---
+
+<div align="center">
+
+Built with ☕ for the [Repeatless](https://repeatless.in) Technical Assessment
+
+</div>
