@@ -14,6 +14,11 @@ export default async function LoginPage(): Promise<JSX.Element> {
       }} />
 
       <div className="relative z-10 w-full max-w-md">
+        {/* Info Banner */}
+        <div className="mb-4 rounded-lg border border-[#d0bcff]/20 bg-[#d0bcff]/5 px-4 py-3 text-[12px] text-[#cbc3d7] leading-5">
+          <strong className="text-[#d0bcff]">Note:</strong> This app is not Google-verified (takes 4-6 weeks). When signing in, click <strong>&quot;Advanced&quot;</strong> → <strong>&quot;Go to app (unsafe)&quot;</strong> to proceed. This is standard for demo apps.
+        </div>
+
         {/* Login Card */}
         <div className="glass-card ai-glow rounded-xl p-8 md:p-10 flex flex-col items-center text-center">
           {/* Logo */}
