@@ -1,6 +1,5 @@
 "use client";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== "undefined" ? window.location.origin.replace(/:3000/, ":4000") : "http://localhost:4000");
 const BACKEND_SECRET = process.env.NEXT_PUBLIC_BACKEND_SECRET || "super-secret-internal-key-change-me";
 
 /** Gets the current user session from NextAuth. */
@@ -15,10 +14,13 @@ async function getSession(): Promise<{ userId: string; accessToken?: string } | 
   }
 }
 
-/** Calls the Express backend with auth context. */
+/** Calls the backend API. In production, same origin (/v1/*). In dev, localhost:4000. */
 export async function api(path: string, options?: { method?: string; body?: unknown }): Promise<Response> {
   const session = await getSession();
   if (!session) throw new Error("Not authenticated");
+
+  // Use same origin in production, localhost:4000 in dev
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -39,5 +41,5 @@ export async function api(path: string, options?: { method?: string; body?: unkn
     fetchOptions.body = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
   }
 
-  return fetch(`${BACKEND_URL}${path}`, fetchOptions);
+  return fetch(`${baseUrl}${path}`, fetchOptions);
 }
