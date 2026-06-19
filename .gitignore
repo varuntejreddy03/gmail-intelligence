@@ -27,6 +27,13 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+
+# OAuth client exports contain credentials
+client_secret_*.json
+
+# lock files (optional - remove if you want to track)
+# package-lock.json
 
 # vercel
 .vercel
