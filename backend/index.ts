@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
+import { initialSync, incrementalSync } from "@/lib/gmail/sync";
 
 const app = express();
 const PORT = Number(process.env.BACKEND_PORT || 4000);
@@ -66,8 +67,6 @@ app.get("/v1/gmail/thread/:id", auth, async (req: any, res) => {
 
 app.post("/v1/gmail/sync", auth, async (req: any, res) => {
   res.status(202).json({ status: "started" });
-  // Import sync dynamically to avoid caching issues
-  const { initialSync, incrementalSync } = await import("./src/services/gmail.service" as any).catch(() => require("@/lib/gmail/sync"));
   const state = await supabase.from("sync_state").select("*").eq("user_id", req.userId).maybeSingle();
   if (state.data?.last_full_sync_at) {
     incrementalSync(req.userId, req.accessToken).catch(console.error);
